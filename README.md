@@ -28,19 +28,3 @@ Pour figer une version :
 environment:
   - PROXYGUARD_VERSION=v2.0.1
 ```
-
-## 8. Workflow GitHub Actions pour build/push l’image (avec bouton)
-
-On va utiliser **GitHub Container Registry (GHCR)** pour publier l’image.  
-On veut :
-
-- build/push **automatiquement** sur **push** (par ex. sur `main`),
-- + **manuellement** via un bouton “Run workflow” dans l’onglet **Actions**.
-
-### 8.1. Fichier `.github/workflows/docker-image.yml`
-
-Crée le dossier puis le fichier :
-
-```bash
-mkdir -p .github/workflows
-```
