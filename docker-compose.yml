@@ -1,0 +1,31 @@
+services:
+  proxyguard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: proxyguard
+    restart: unless-stopped
+
+    # Recommandé si WireGuard + reverse proxy sont aussi sur le host
+    network_mode: host
+
+    environment:
+      # Si tu laisses cette variable COMMENTÉE ou absente :
+      # -> le conteneur récupère automatiquement la dernière release.
+      # Si tu veux figer une version précise :
+      # - PROXYGUARD_VERSION=v2.0.1
+
+      # Paramètres réseau ProxyGuard
+      - LISTEN_ADDR=127.0.0.1:51821
+      - TO=127.0.0.1:51820
+
+      # Infos HTTP / reverse proxy (doc)
+      - PROXYGUARD_HTTP_PREFIX=/proxyguard/vpn.example.org
+      - VPN_SERVER_NAME=vpn.example.org
+
+      # Infos API/Codeberg (log/doc)
+      - CODEBERG_API_BASE=https://codeberg.org/api/v1
+      - PROXYGUARD_REPO=eduVPN/proxyguard
+      - PROXYGUARD_BASE_URL=https://codeberg.org/eduVPN/proxyguard/archive
+      - PROXYGUARD_RELEASES_URL=https://codeberg.org/eduVPN/proxyguard/releases

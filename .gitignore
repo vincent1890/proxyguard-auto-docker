@@ -1,1 +1,5 @@
-
+.env
+proxyguard*.tar.gz
+proxyguard*/
+.app
+/app/.proxyguard_version
