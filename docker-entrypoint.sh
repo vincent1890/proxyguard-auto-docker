@@ -48,17 +48,25 @@ if [ -x "/usr/local/bin/proxyguard-server" ] \
 else
   echo "[proxyguard] Build de ProxyGuard ${PROXYGUARD_VERSION}..."
 
-  # On nettoie le répertoire de build (mais pas /usr/local/bin)
-  rm -rf /app/*
+  # On garde juste le fichier de version dans /app, mais on build ailleurs
   echo "${PROXYGUARD_VERSION}" > /app/.proxyguard_version
+
+  BUILD_DIR="/tmp/proxyguard-build"
+  rm -rf "${BUILD_DIR}"
+  mkdir -p "${BUILD_DIR}"
+  cd "${BUILD_DIR}"
 
   echo "[proxyguard] Téléchargement: ${TARBALL_URL}"
   wget -q -O proxyguard.tar.gz "${TARBALL_URL}"
 
-  echo "[proxyguard] Extraction de l'archive..."
-  tar -xzf proxyguard.tar.gz
+  echo "[proxyguard] Extraction de l'archive dans ${BUILD_DIR}..."
+  # On encapsule tar dans un if pour éviter que set -e fasse tout planter
+  if ! tar -xzf proxyguard.tar.gz; then
+    echo "[proxyguard] AVERTISSEMENT: Erreurs pendant l'extraction (chmod, FS exotique ?)."
+    echo "[proxyguard] Vérification du contenu malgré tout..."
+  fi
 
-  SRC_DIR=$(find . -maxdepth 1 -type d -name "proxyguard*" | head -n1)
+  SRC_DIR=$(find "${BUILD_DIR}" -maxdepth 1 -type d -name "proxyguard*" | head -n1)
   if [ -z "${SRC_DIR}" ]; then
     echo "[proxyguard] ERREUR: impossible de trouver le répertoire source après extraction."
     exit 1
@@ -70,7 +78,7 @@ else
   echo "[proxyguard] go build ./cmd/proxyguard-server ..."
   go build -v -o /usr/local/bin/proxyguard-server ./cmd/proxyguard-server
 
-  cd /app
+  cd /
   echo "[proxyguard] Build terminé pour ProxyGuard ${PROXYGUARD_VERSION}."
 fi
 
@@ -81,4 +89,3 @@ echo "[proxyguard] Commande: proxyguard-server --listen \"${LISTEN_ADDR}\" --to 
 echo "[proxyguard] ============================================="
 
 exec /usr/local/bin/proxyguard-server --listen "${LISTEN_ADDR}" --to "${TO}"
-
